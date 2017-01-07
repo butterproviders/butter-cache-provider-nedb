@@ -1,6 +1,6 @@
 {
   "name": "butter-cache-provider-nedb",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A butter provider implementing caching through NeDB",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/butterproviders/butter-cache-provider-nedb#readme",
   "dependencies": {
-    "butter-cache-provider": "file:///home/xaiki/src/Butter/Providers/butter-cache-provider",
+    "butter-cache-provider": "git+https://github.com/butterproviders/butter-cache-provider.git",
     "butter-provider": "^0.9.7",
     "nedb": "^1.8.0"
   }
