@@ -81,6 +81,7 @@ NeDBCacheProvider.prototype.updateFetch = function (data) {
                            db.update({_id: r._id}, r, {upsert: true},
                                      (err, num) => (err ? reject(err) : accept(num))))))
     return Promise.all(promises)
+                  .then(db.persistence.compactDatafile())
                   .catch(console.log.bind(console, 'Error Updating fetch data:'))
 }
 
@@ -103,7 +104,8 @@ NeDBCacheProvider.prototype.updateDetail = function (data) {
         db.update({_id: data._id}, data, {upsert: true},
                   (err, num) => (err ? reject(err) : accept(num))
         )
-    )).catch(console.log.bind(console, 'Error Updating detail data:'))
+    )).then(db.persistence.compactDatafile())
+      .catch(console.log.bind(console, 'Error Updating detail data:'))
 }
 
 module.exports = NeDBCacheProvider
