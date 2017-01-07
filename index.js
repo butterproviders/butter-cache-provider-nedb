@@ -99,6 +99,7 @@ NeDBCacheProvider.prototype.updateDetail = function (data) {
     var db = this.detailDB
     var uniqueId = this.config.uniqueId
 
+    console.log('Updating detail data', id)
     data._id = data[uniqueId]
     return new Promise((accept, reject) => (
         db.update({_id: data._id}, data, {upsert: true},
