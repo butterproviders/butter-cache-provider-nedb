@@ -89,7 +89,8 @@ NeDBCacheProvider.prototype.detailFromDB = function (id) {
     var uniqueId = this.config.uniqueId
 
     return new Promise((accept, reject) => (
-        db.findOne({_id: uniqueId}, (err, doc) => (err ? reject(err) : accept(doc)))
+        db.findOne({_id: id}, (err, doc) =>
+            (err ? reject(err) : doc ? accept(doc) : reject(doc)))
     ))
 }
 
