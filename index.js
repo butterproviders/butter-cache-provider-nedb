@@ -15,8 +15,8 @@ function getDB(file) {
 var NeDBCacheProvider = function () {
     NeDBCacheProvider.super_.apply(this, arguments)
 
-    this.fetchDB  = getDB(this.configDir + '/fetch.db')
-    this.detailDB = getDB(this.configDir + '/detail.db')
+    this.fetchDB  = getDB(this.configDir + '/nedb-fetch.db')
+    this.detailDB = getDB(this.configDir + '/nedb-detail.db')
 }
 
 inherits(NeDBCacheProvider, CacheProvider)
