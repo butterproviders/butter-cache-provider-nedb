@@ -76,37 +76,45 @@ NeDBCacheProvider.prototype.updateFetch = function (data) {
 
     console.log('Updating fetch data')
     var promises = data.results
+                       .filter(r => r)
                        .map(r => Object.assign(r, {_id: r[uniqueId]}))
                        .map(r => (new Promise((accept, reject) =>
                            db.update({_id: r._id}, r, {upsert: true},
                                      (err, num) => (err ? reject(err) : accept(num))))))
     return Promise.all(promises)
-                  .then(db.persistence.compactDatafile())
-                  .catch(console.log.bind(console, 'Error Updating fetch data:'))
+                  .catch(console.error.bind(console, 'Error Updating fetch data:'))
 }
 
-NeDBCacheProvider.prototype.detailFromDB = function (id) {
+NeDBCacheProvider.prototype.detailFromDB = function (id, old) {
     var db = this.detailDB
-    var uniqueId = this.config.uniqueId
 
+    return Promise.reject(old)
     return new Promise((accept, reject) => (
-        db.findOne({_id: id}, (err, doc) =>
-            (err ? reject(err) : doc ? accept(doc) : reject(doc)))
+        db.findOne({_id: id}, (err, doc) => {
+            if (err) return reject(err)
+            if (!doc) return reject(doc)
+            return accept(doc)
+        })
     ))
 }
 
 NeDBCacheProvider.prototype.updateDetail = function (data) {
     var db = this.detailDB
     var uniqueId = this.config.uniqueId
+    var id = data[uniqueId]
 
     console.log('Updating detail data', id)
-    data._id = data[uniqueId]
     return new Promise((accept, reject) => (
-        db.update({_id: data._id}, data, {upsert: true},
-                  (err, num) => (err ? reject(err) : accept(num))
-        )
-    )).then(db.persistence.compactDatafile())
-      .catch(console.log.bind(console, 'Error Updating detail data:'))
+        db.findOne({_id: id}, (err, doc) => {
+            if (err) return reject(err)
+            if (!doc) return db.insert(data, (err, doc) => err?reject(err):accept(doc))
+            if (JSON.stringify(doc) === JSON.stringify(data)) return accept(doc)
+            db.update({_id: id}, data, {upsert: true}, (err, num, b, c) => {
+                if (err) return reject(err)
+                return accept(num)
+            })
+        })
+    )).catch(console.error.bind(console, 'Error Updating detail data:'))
 }
 
 module.exports = NeDBCacheProvider
